@@ -1,0 +1,113 @@
+---
+title: "Insights from a Public Lecture: Word Cloud Analysis"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    collapsed: false
+    number_sections: false
+    toc_depth: 1
+    #code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	cache = TRUE
+)
+```
+<br>
+
+```
+For this task, our objective is to visualize the key points and themes from a public lecture delivered by the Secretary General of the National Energy Council. This lecture, held on May 29, 2024, at FISIP UPNVJ, covers critical topics related to energy policy and strategy. To achieve this, we create a word cloud visualization, which helps to highlight the most frequently discussed words and phrases from the lecture. This visualization provides a quick and impactful way to understand the main topics and issues emphasized by the speaker, offering valuable insights into the current discourse on national energy policies.
+```
+
+<br>
+
+## Load required libraries
+
+```{r warning=FALSE, message=FALSE}
+# Load the required libraries
+library(tm)
+library(wordcloud)
+library(RColorBrewer)
+```
+
+<br>
+
+# Data Preprocessing
+
+```{r warning=FALSE, message=FALSE}
+# Read the text file
+text <- readLines("resources/transcript.txt", encoding = "UTF-8")
+
+# Create a corpus
+corpus <- Corpus(VectorSource(text))
+```
+
+<br>
+
+# Data Cleaning
+
+```{r warning=FALSE, message=FALSE}
+# Define a list of Indonesian stopwords
+stopwords_id <- c("yang", "dan", "di", "ke", "dari", "ini", "itu", "dengan", "untuk", "pada", "adalah", "sebagai", "dalam", "tidak", "akan", "atau", "juga", "oleh", "sudah", "kami", "karena", "pada", "tersebut", "dapat", "antara", "saya", "ia", "namun", "lebih", "seperti", "bagi", "oleh", "mereka", "setelah", "jika", "saat", "hingga", "kami", "kita", "terus")
+
+# Text cleansing
+corpus <- tm_map(corpus, content_transformer(tolower)) # Convert to lowercase
+corpus <- tm_map(corpus, removePunctuation)            # Remove punctuation
+corpus <- tm_map(corpus, removeNumbers)                # Remove numbers
+corpus <- tm_map(corpus, removeWords, stopwords_id)    # Remove Indonesian stopwords
+corpus <- tm_map(corpus, stripWhitespace)              # Strip whitespace
+```
+
+<br>
+
+# Wordcloud Visualization
+
+```{r warning=FALSE, message=FALSE}
+# Create a term-document matrix
+tdm <- TermDocumentMatrix(corpus)
+
+# Convert the term-document matrix into a matrix
+m <- as.matrix(tdm)
+
+# Get word frequencies
+word_freqs <- sort(rowSums(m), decreasing = TRUE)
+
+# Create a data frame with words and their frequencies
+word_freqs_df <- data.frame(word = names(word_freqs), freq = word_freqs)
+
+# Generate the word cloud
+set.seed(1234) # for reproducibility
+wordcloud(words = word_freqs_df$word, freq = word_freqs_df$freq,
+          min.freq = 2, max.words = 200,
+          random.order = FALSE, rot.per = 0.35,
+          colors = brewer.pal(8, "Dark2"))
+```
+
+<br>
+
+# Commentary
+
+<br>
+
+#### Key Terms
+
+- Energi (Energy): The most prominent term, indicating the primary focus of the lecture.
+- Mengurangi (Reducing), Meningkatkan (Increasing), Minyak (Oil), Listrik (Electricity), Pemerintah (Government), Kebijakan (Policy): These terms suggest important topics discussed in the lecture, such as reducing emissions, increasing renewable energy usage, the role of oil and electricity, government policies, and strategies for improvement.
+- Emisi (Emissions), Teknologi (Technology), Produksi (Production): Indicating discussions around technological advancements, emission reductions, and production methods in the context of renewable energy.
+
+#### Themes
+
+- Renewable Energy Transition: The frequent mention of "mengurangi" and "meningkatkan" implies discussions on transitioning from fossil fuels to renewable energy sources.
+- Government and Policy: The presence of "pemerintah" and "kebijakan" indicates the role of governmental policies in shaping the energy landscape.
+- Technological Innovations: Terms like "teknologi" and "produksi" suggest a focus on technological solutions and innovations in energy production.
+
+#### Implications
+
+- Focus on Sustainability: The word cloud highlights the emphasis on sustainability, reducing emissions, and increasing the use of renewable energy.
+- Policy and Governance: It underscores the importance of government intervention and policy-making in achieving renewable energy goals.
+- Public Awareness and Education: The varied terms indicate a comprehensive discussion aimed at educating the public on various aspects of renewable energy, from technical details to policy measures.
+

@@ -1,0 +1,13 @@
+name: "bigDataInIR"
+navbar:
+  title: "Big Data in International Relations"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Task 1"
+      href: Task-1.html
+    - text: "Task 2"
+      href: Task-2.html
+    - text: "Task 3"
+      href: Task-3.html
+output_dir: "docs"
